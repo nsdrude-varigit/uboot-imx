@@ -33,6 +33,10 @@ config SAVED_DRAM_TIMING_BASE
 	  purpose on i.MX8MM.
 	default 0x180000
 
+config IMX8M_DDRPHY_FW_OFFSET
+	int "Offset of DDR PHY firmware from the end of the SPL image"
+	default 0
+
 config IMX8M_DRAM_INLINE_ECC
 	bool "imx8mp inline ECC"
 	depends on IMX8MP && IMX8M_LPDDR4
