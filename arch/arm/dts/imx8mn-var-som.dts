@@ -15,7 +15,7 @@
 
 /dts-v1/;
 
-#include "fsl-imx8mn.dtsi"
+#include "imx8mn.dtsi"
 
 / {
 	model = "Variscite VAR-SOM-MX8MN";
