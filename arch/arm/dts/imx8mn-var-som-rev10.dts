@@ -25,13 +25,13 @@
 	imx8mn-var-som {
 		pinctrl_usdhc2_gpio: usdhc2grpgpio {
 			fsl,pins = <
-				MX8MN_IOMUXC_SD2_CD_B__GPIO2_IO12	0xc1
+				MX8MN_IOMUXC_SD2_CD_B_GPIO2_IO12	0xc1
 			>;
 		};
 
 		pinctrl_typec: typecgrp {
 			fsl,pins = <
-				MX8MN_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x16
+				MX8MN_IOMUXC_GPIO1_IO10_GPIO1_IO10	0x16
 			>;
 		};
 	};
