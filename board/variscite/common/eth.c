@@ -1,7 +1,7 @@
 #include <common.h>
 #include <net.h>
 #include <miiphy.h>
-#include <environment.h>
+#include <env.h>
 
 #include "../common/imx8_eeprom.h"
 
