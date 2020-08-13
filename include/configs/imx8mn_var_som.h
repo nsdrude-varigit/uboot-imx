@@ -13,6 +13,7 @@
 
 #include "imx_env.h"
 
+#define PHYS_SDRAM_SIZE			0x20000000 /* 512MB DDR, Not Used, see get_dram_size and board_phys_sdram_size */
 #ifdef CONFIG_SECURE_BOOT
 #define CONFIG_CSF_SIZE			0x2000 /* 8K region */
 #endif

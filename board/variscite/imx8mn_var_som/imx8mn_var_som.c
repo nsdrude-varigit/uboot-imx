@@ -107,15 +107,7 @@ static unsigned long long get_dram_size(void)
 	return (1ULL * dram_size_mb) << 20;
 }
 
-int dram_init_banksize(void)
-{
-	gd->bd->bi_dram[0].start = CONFIG_SYS_SDRAM_BASE;
-	gd->bd->bi_dram[0].size = get_dram_size();
-
-	return 0;
-}
-
-int dram_init(void)
+int board_phys_sdram_size(phys_size_t *size)
 {
 	unsigned long long mem_size, max_low_size, dram_size;
 
@@ -127,8 +119,9 @@ int dram_init(void)
 	else
 		mem_size = dram_size;
 
-	/* rom_pointer[1] contains the size of TEE occupies */
-	gd->ram_size = mem_size - rom_pointer[1];
+	*size = (phys_size_t) mem_size;
+
+	printf("board_phys_sdram_size board %d\n", mem_size);
 
 	return 0;
 }
