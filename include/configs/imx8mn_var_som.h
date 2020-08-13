@@ -18,7 +18,6 @@
 #define CONFIG_CSF_SIZE			0x2000 /* 8K region */
 #endif
 
-#define CONFIG_SPL_TEXT_BASE		0x00912000
 #define CONFIG_SPL_MAX_SIZE		(148 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
@@ -234,8 +233,6 @@
 #define CONFIG_ENV_OVERWRITE
 
 /* Default ENV offset is 4MB for SD/EMMC/FSPI, but NAND uses 60MB offset, overridden by env_get_offset */
-#define CONFIG_ENV_OFFSET		(64 * SZ_64K)
-#define CONFIG_ENV_SIZE			0x1000
 #define CONFIG_ENV_SECT_SIZE		(64 * 1024)
 #define CONFIG_SYS_MMC_ENV_DEV		1 /* USDHC2 */
 
