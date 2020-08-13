@@ -50,6 +50,13 @@
 			gpio = <&gpio2 9 GPIO_ACTIVE_HIGH>;
 		};
 	};
+
+	usbgadget0: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
+	};
 };
 
 &iomuxc {
