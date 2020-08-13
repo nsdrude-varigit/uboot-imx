@@ -14,6 +14,7 @@
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/arch/imx8mn_pins.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <power/pmic.h>
 #include <power/bd71837.h>
 #include <asm/arch/clock.h>
@@ -26,6 +27,27 @@
 #include "../common/imx8_eeprom.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+int spl_board_boot_device(enum boot_device boot_dev_spl)
+{
+	printf("new spl_board_boot_device %d\n",boot_dev_spl);
+	switch (boot_dev_spl) {
+	case SD2_BOOT:
+	case MMC2_BOOT:
+		return BOOT_DEVICE_MMC1;
+	case SD3_BOOT:
+	case MMC3_BOOT:
+		return BOOT_DEVICE_MMC2;
+	case QSPI_BOOT:
+		return BOOT_DEVICE_NOR;
+	case NAND_BOOT:
+		return BOOT_DEVICE_NAND;
+	case USB_BOOT:
+		return BOOT_DEVICE_BOARD;
+	default:
+		return BOOT_DEVICE_NONE;
+	}
+}
 
 void spl_dram_init(void)
 {
@@ -176,6 +198,13 @@ int power_init_board(void)
 
 void spl_board_init(void)
 {
+#ifndef CONFIG_SPL_USB_SDP_SUPPORT
+	/* Serial download mode */
+	if (is_usb_boot()) {
+		puts("Back to ROM, SDP\n");
+		restore_boot_params();
+	}
+#endif
 	puts("Normal Boot\n");
 }
 
