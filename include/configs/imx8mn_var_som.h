@@ -274,8 +274,9 @@
 #define CONFIG_SUPPORT_EMMC_BOOT	/* eMMC specific */
 
 #define CONFIG_MXC_GPIO
-
+#ifndef CONFIG_MXC_OCOTP
 #define CONFIG_MXC_OCOTP
+#endif
 #define CONFIG_CMD_FUSE
 
 /* I2C configs */
