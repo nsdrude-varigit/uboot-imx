@@ -16,11 +16,11 @@
 /dts-v1/;
 
 #include "imx8mn.dtsi"
+#include "imx8mn-var-som-u-boot.dtsi"
 
 / {
 	model = "Variscite VAR-SOM-MX8MN";
 	compatible = "variscite,imx8mn-var-som", "fsl,imx8mn";
-
 	chosen {
 		bootargs = "console=ttymxc3,115200 earlycon=ec_imx6q,0x30a60000,115200";
 		stdout-path = &uart4;
@@ -50,18 +50,10 @@
 			gpio = <&gpio2 9 GPIO_ACTIVE_HIGH>;
 		};
 	};
-
-	usbgadget0: usbg1 {
-		compatible = "fsl,imx27-usb-gadget";
-		dr_mode = "peripheral";
-		chipidea,usb = <&usbotg1>;
-		status = "okay";
-	};
 };
 
 &iomuxc {
 	pinctrl-names = "default";
-
 	imx8mn-var-som {
 		pinctrl_fec1: fec1grp {
 			fsl,pins = <
@@ -259,7 +251,6 @@
 	pinctrl-1 = <&pinctrl_i2c1_gpio>;
 	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
 	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
-	u-boot,dm-pre-reloc;
 	status = "okay";
 
 	pmic: bd71837@4b {
@@ -506,6 +497,16 @@
 	status = "okay";
 };
 
-&gpio5 {
+&pinctrl_i2c1 {
+	u-boot,dm-spl;
 	u-boot,dm-pre-reloc;
+};
+
+&pinctrl_i2c1 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&pinctrl_uart4 {
+	u-boot,dm-spl;
 };
