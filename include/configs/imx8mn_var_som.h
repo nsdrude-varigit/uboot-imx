@@ -80,7 +80,7 @@
 #undef CONFIG_BOOTM_NETBSD
 
 /* ENET Config */
-#if defined(CONFIG_CMD_NET)
+#if defined(CONFIG_FEC_MXC)
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_MII
@@ -90,7 +90,9 @@
 #define CONFIG_FEC_MXC
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define FEC_QUIRK_ENET_MAC
-
+#ifndef CONFIG_CMD_NET
+#define CONFIG_CMD_NET
+#endif
 #define CONFIG_PHY_GIGE
 
 #define CONFIG_PHYLIB
