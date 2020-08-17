@@ -87,7 +87,6 @@
 #define CONFIG_MII
 #define CONFIG_ETHPRIME			"FEC"
 
-#define CONFIG_FEC_MXC
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define FEC_QUIRK_ENET_MAC
 #ifndef CONFIG_CMD_NET
