@@ -121,8 +121,6 @@ int board_phys_sdram_size(phys_size_t *size)
 
 	*size = (phys_size_t) mem_size;
 
-	printf("board_phys_sdram_size board %d\n", mem_size);
-
 	return 0;
 }
 
