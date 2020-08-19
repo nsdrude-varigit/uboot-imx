@@ -16,7 +16,6 @@
 /dts-v1/;
 
 #include "imx8mn.dtsi"
-#include "imx8mn-var-som-u-boot.dtsi"
 
 / {
 	model = "Variscite VAR-SOM-MX8MN";
@@ -496,18 +495,4 @@
 
 &usbotg1 {
 	status = "okay";
-};
-
-&pinctrl_i2c1 {
-	u-boot,dm-spl;
-	u-boot,dm-pre-reloc;
-};
-
-&pinctrl_i2c1 {
-	u-boot,dm-spl;
-	u-boot,dm-pre-reloc;
-};
-
-&pinctrl_uart4 {
-	u-boot,dm-spl;
 };
