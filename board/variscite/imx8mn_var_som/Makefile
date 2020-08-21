@@ -12,7 +12,7 @@ ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 obj-$(CONFIG_IMX8M_DDR4) += ddr4_timing.o
 else
-obj-y += imx8mn_var_som.o ../common/mmc.o
+obj-y += ../common/mmc.o
 obj-$(CONFIG_VIDEO) += ../common/video.o
 obj-$(CONFIG_FEC_MXC) += ../common/eth.o
 obj-$(CONFIG_IMX8M_BOARD_INIT_DRAM) += ../common/imx8_dram.o

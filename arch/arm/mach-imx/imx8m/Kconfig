@@ -134,6 +134,7 @@ config TARGET_IMX8MN_VAR_SOM
 	select IMX8MN
 	select SUPPORT_SPL
 	select IMX8M_DDR4
+	select IMX8M_BOARD_INIT_DRAM
 
 config TARGET_VERDIN_IMX8MM
        bool "Support Toradex Verdin iMX8M Mini module"

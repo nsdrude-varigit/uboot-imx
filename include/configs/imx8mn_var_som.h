@@ -176,7 +176,7 @@
 		"fi;\0" \
 	"netargs=setenv bootargs console=${console} " \
 		"root=/dev/nfs ${cma_size} " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+		"ip=dhcp nfsroot=${serverip}:${nfsroot},tcp\0" \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
@@ -184,7 +184,6 @@
 			"setenv get_cmd tftp; " \
 		"fi; " \
 		"${get_cmd} ${img_addr} ${image}; unzip ${img_addr} ${loadaddr};" \
-		"run ramsize_check; " \
 		"run netargs; " \
 		"run optargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
@@ -242,14 +241,12 @@
 
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 #define PHYS_SDRAM			0x40000000
-#define DEFAULT_DRAM_SIZE_MB		512
-#define CONFIG_IMX8M_BOARD_INIT_DRAM
-#define PHYS_SDRAM_SIZE			(DEFAULT_DRAM_SIZE_MB << 20) /* 512MB Min DDR4, see get_dram_size */
-#define VAR_EEPROM_DRAM_START           (PHYS_SDRAM + (PHYS_SDRAM_SIZE >> 1))
+#define DEFAULT_DRAM_SIZE 			(512 * SZ_1M) /* 512MB Minimum DDR4, see get_dram_size */
+#define VAR_EEPROM_DRAM_START           (PHYS_SDRAM + (DEFAULT_DRAM_SIZE >> 1))
 
 #define CONFIG_SYS_MEMTEST_START	PHYS_SDRAM
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + \
-					(DEFAULT_DRAM_SIZE_MB >> 1) * SZ_1M)
+					(DEFAULT_DRAM_SIZE >> 1))
 
 #define CONFIG_BAUDRATE			115200
 
