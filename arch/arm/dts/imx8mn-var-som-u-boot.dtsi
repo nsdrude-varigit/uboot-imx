@@ -104,13 +104,6 @@
 	assigned-clock-parents = <&clk IMX8MN_SYS_PLL1_400M>;
 };
 
-&lcdif {
-	enable_polarity_low;
-	/delete-property/ assigned-clocks;
-	/delete-property/ assigned-clock-parents;
-	/delete-property/ assigned-clock-rates;
-};
-
 &pinctrl_uart4 {
 	u-boot,dm-spl;
 };
