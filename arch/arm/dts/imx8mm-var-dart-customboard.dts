@@ -151,10 +151,12 @@
 };
 
 &usbotg1 {
+	dr_mode = "otg";
 	status = "okay";
 };
 
 &usbotg2 {
+	dr_mode = "host";
 	status = "okay";
 };
 
