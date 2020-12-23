@@ -71,6 +71,7 @@
 	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
 	"img_addr=0x42000000\0"			\
 	"fdt_addr=0x43000000\0"			\
+	"fdtovaddr=0x44000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"boot_fdt=try\0" \
 	"ip_dyn=yes\0" \
@@ -81,6 +82,7 @@
 	"mmcpart=1\0" \
 	"m4_addr=0x7e0000\0" \
 	"m4_bin=hello_world.bin\0" \
+	"overlay=imx8mq-var-dart-sd imx8mq-var-dart-lvds-dcss\0" \
 	"use_m4=no\0" \
 	"loadm4bin=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${m4_bin} && " \
 	"cp.b ${loadaddr} ${m4_addr} ${filesize}\0" \
@@ -92,7 +94,7 @@
 			"dcache flush; " \
 		"fi; " \
 		"bootaux ${m4_addr};\0" \
-	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
+	"optargs=setenv bootargs ${bootargs} ${kernelargs} ${overlay};\0" \
 	"mmcargs=setenv bootargs console=${console} " \
 		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw ${cma_size}\0" \
 	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${script};\0" \
@@ -117,20 +119,31 @@
 	"findfdt=" \
 		"if test $fdt_file = undefined; then " \
 			"if gpio input 12; then " \
-				"setenv fdt_file imx8mq-var-dart-cb12.dtb; " \
+				"setenv fdt_file imx8mq-var-dart-dt8mcustomboard-cb12.dtb; " \
 			"else " \
-				"setenv fdt_file imx8mq-var-dart.dtb;" \
+				"setenv fdt_file imx8mq-var-dart-dt8mcustomboard.dtb;" \
 			"fi; " \
 		"fi; \0" \
 	"loadfdt=run findfdt; " \
 		"echo fdt_file=${fdt_file}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${bootdir}/${fdt_file}\0" \
+	"loadfdt_overlay=fdt addr ${fdt_addr}; " \
+		"fdt resize 8192; " \
+		"for ov in ${overlay}; do " \
+			"echo overlaying ${ov}...; " \
+			"load mmc ${mmcdev}:${mmcpart} ${fdtovaddr} ${bootdir}/${ov}.dtb && " \
+			"fdt apply ${fdtovaddr}; " \
+		"done; \0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
 		"run optargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
+				"if run loadfdt_overlay; then " \
+					"booti ${loadaddr} - ${fdt_addr}; " \
+				"else " \
+					"echo WARN: Cannot load the DT overlay; " \
+				"fi; " \
 			"else " \
 				"echo WARN: Cannot load the DT; " \
 			"fi; " \
