@@ -17,7 +17,7 @@
  * 1. Support PCA957X_TYPE
  * 2. Support Polarity Inversion
  */
-
+#define DEBUG 1
 #include <common.h>
 #include <errno.h>
 #include <dm.h>
@@ -34,6 +34,7 @@
 #define PCA953X_OUTPUT          1
 #define PCA953X_INVERT          2
 #define PCA953X_DIRECTION       3
+#define PCAL6408A_IRQ_MASK      0x45
 
 #define PCA_GPIO_MASK           0x00FF
 #define PCA_INT                 0x0100
@@ -71,6 +72,7 @@ struct pca953x_info {
 	int bank_count;
 	u8 reg_output[MAX_BANK];
 	u8 reg_direction[MAX_BANK];
+	u32 pcal6408_irq_mask;
 };
 
 static int pca953x_write_single(struct udevice *dev, int reg, u8 val,
@@ -269,6 +271,31 @@ static const struct dm_gpio_ops pca953x_ops = {
 	.xlate			= pca953x_xlate,
 };
 
+static int pcal6408_write_irq_mask(struct udevice *dev, u8 irq_mask) {
+	int ret;
+	u8 val[MAX_BANK];
+
+	/* Detect TCA6408APWR or PCAL6408APWJ by reading register 0x45 */
+	ret = pca953x_read_regs(dev, PCAL6408A_IRQ_MASK, val);
+	if (ret) {
+		dev_dbg(dev, "%s detected TCA6408APWR, skipping\n", __func__);
+		return 0;
+	} else {
+		dev_dbg(dev, "%s detected PCAL6408APWJ, writing irq mask register 0x%02x = 0x%02x \n", \
+			__func__, PCAL6408A_IRQ_MASK, irq_mask);
+
+		memset(val, 0xff, MAX_BANK);
+		val[0] = irq_mask;
+		ret = pca953x_write_regs(dev, PCAL6408A_IRQ_MASK, val);
+		if (ret < 0) {
+			dev_err(dev, "Error writing PCAL6408APWJ interrupt mask register\n");
+			return ret;
+		}
+	}
+
+	return 0;
+}
+
 static int pca953x_probe(struct udevice *dev)
 {
 	struct pca953x_info *info = dev_get_plat(dev);
@@ -333,6 +360,12 @@ static int pca953x_probe(struct udevice *dev)
 		return ret;
 	}
 
+	/* Get optional pcal6408 irq mask */
+	if (!dev_read_u32_index(dev, "pcal6408-irq-mask", 0, &info->pcal6408_irq_mask)) {
+		dev_dbg(dev, "pcal6408-irq-mask = 0x%02x\n", info->pcal6408_irq_mask);
+		pcal6408_write_irq_mask(dev, (u8) info->pcal6408_irq_mask);
+	}
+
 	str = strdup(name);
 	if (!str)
 		return -ENOMEM;
@@ -362,6 +395,7 @@ static const struct udevice_id pca953x_ids[] = {
 	{ .compatible = "nxp,pca9574", .data = OF_957X(8, PCA_INT), },
 	{ .compatible = "nxp,pca9575", .data = OF_957X(16, PCA_INT), },
 	{ .compatible = "nxp,pca9698", .data = OF_953X(40, 0), },
+	{ .compatible = "nxp,pcal6408", .data = OF_953X(8, PCA_INT), },
 
 	{ .compatible = "maxim,max7310", .data = OF_953X(8, 0), },
 	{ .compatible = "maxim,max7312", .data = OF_953X(16, PCA_INT), },
