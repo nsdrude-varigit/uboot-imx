@@ -68,14 +68,50 @@
 	status = "okay";
 
 	pca6408_1: gpio@20 {
-		compatible = "ti,tca6408";
+		compatible = "nxp,pcal6408", "ti,tca6408";
 		reg = <0x20>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca6408>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
+		pcal6408-irq-mask = <0x0F>; /* Enable interrupts for GPIO 4-7 (DT8MCustomboard Buttons) */
+
+		/* Configure outputs to default state, triggering driver to probe
+		and initialize pcal6408 interrupt register for GPIO Buttons */
+
+		exp_csi_p1_pwren_hog {
+			gpio-hog;
+			gpios = <0 GPIO_ACTIVE_HIGH>;
+			output-low;
+			line-name = "exp_csi_p1_pwren";
+		};
+
+		exp_csi_p2_pwren_hog {
+			gpio-hog;
+			gpios = <1 GPIO_ACTIVE_HIGH>;
+			output-low;
+			line-name = "exp_csi_p2_pwren";
+		};
+
+		exp_csi_p1_rst_hog {
+			gpio-hog;
+			gpios = <2 GPIO_ACTIVE_HIGH>;
+			output-low;
+			line-name = "exp_csi_p1_rst";
+		};
+
+		exp_csi_p2_rst_hog {
+			gpio-hog;
+			gpios = <3 GPIO_ACTIVE_HIGH>;
+			output-low;
+			line-name = "exp_csi_p2_rst";
+		};
 	};
 
 	pca6408_2: gpio@21 {
-		compatible = "ti,tca6408";
+		compatible = "nxp,pcal6408", "ti,tca6408";
 		reg = <0x21>;
 		gpio-controller;
 		#gpio-cells = <2>;
@@ -189,6 +225,12 @@
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C4_SCL__GPIO5_IO20				0x1c2
 			MX8MP_IOMUXC_I2C4_SDA__GPIO5_IO21				0x1c2
+		>;
+	};
+
+	pinctrl_pca6408: pca6408grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO05__GPIO1_IO05				0x1c6
 		>;
 	};
 
