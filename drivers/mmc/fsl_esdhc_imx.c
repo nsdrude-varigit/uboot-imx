@@ -656,6 +656,8 @@ static void set_sysctl(struct fsl_esdhc_priv *priv, struct mmc *mmc, uint clock)
 	while (sdhc_clk / (div * pre_div * ddr_pre_div) > clock && div < 16)
 		div++;
 
+	mmc->clock = sdhc_clk / pre_div / div / ddr_pre_div;
+
 	pre_div >>= 1;
 	div -= 1;
 
