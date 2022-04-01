@@ -16,6 +16,63 @@
 #define ADIN1300_EXT_REG_PTR		0x10
 #define ADIN1300_EXT_REG_DATA		0x11
 #define ADIN1300_GE_RGMII_CFG		0xff23
+#define ADIN1300_GE_RGMII_RXID_EN	BIT(2)
+#define ADIN1300_GE_RGMII_TXID_EN	BIT(1)
+#define ADIN1300_GE_RGMII_EN		BIT(0)
+
+static u16 adin_ext_read(struct phy_device *phydev, const u32 regnum) {
+	u16 val;
+
+	phy_write(phydev, MDIO_DEVAD_NONE, ADIN1300_EXT_REG_PTR, regnum);
+	val = phy_read(phydev, MDIO_DEVAD_NONE, ADIN1300_EXT_REG_DATA);
+
+	printf("adin_ext_read: adin1300@0x%x 0x%x=0x%x\n", phydev->addr, regnum, val);
+
+	return val;
+}
+
+static int adin_ext_write(struct phy_device *phydev, const u32 regnum, const u16 val) {
+
+	printf("adin_ext_write: adin1300@0x%x 0x%x=0x%x\n", phydev->addr, regnum, val);
+
+	phy_write(phydev, MDIO_DEVAD_NONE, ADIN1300_EXT_REG_PTR, regnum);
+
+	return phy_write(phydev, MDIO_DEVAD_NONE, ADIN1300_EXT_REG_DATA, val);
+}
+
+static int adin_config_rgmii_mode(struct phy_device *phydev)
+{
+	u16 val;
+
+	val = adin_ext_read(phydev, ADIN1300_GE_RGMII_CFG);
+
+	if (!phy_interface_is_rgmii(phydev)) {
+		/* Disable RGMII */
+		val &= ~ADIN1300_GE_RGMII_EN;
+		return adin_ext_write(phydev, ADIN1300_GE_RGMII_CFG, val);
+	}
+
+	/* Enable RGMII */
+	val |= ADIN1300_GE_RGMII_EN;
+
+	/* Enable / Disable RGMII RX Delay */
+	if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
+	    phydev->interface == PHY_INTERFACE_MODE_RGMII_RXID) {
+		val |= ADIN1300_GE_RGMII_RXID_EN;
+	} else {
+		val &= ~ADIN1300_GE_RGMII_RXID_EN;
+	}
+
+	/* Enable / Disable RGMII RX Delay */
+	if (phydev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
+	    phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID) {
+		val |= ADIN1300_GE_RGMII_TXID_EN;
+	} else {
+		val &= ~ADIN1300_GE_RGMII_TXID_EN;
+	}
+
+	return adin_ext_write(phydev, ADIN1300_GE_RGMII_CFG, val);
+}
 
 int board_phy_config(struct phy_device *phydev)
 {
@@ -33,9 +90,7 @@ int board_phy_config(struct phy_device *phydev)
 		break;
 	case ADIN1300_PHY_ID_1:
 		printf("ADIN1300 PHY detected at addr %d\n", phydev->addr);
-		/* ADIN1300 Disable RGMII RX clock delay (enabled by default) */
-		phy_write(phydev, MDIO_DEVAD_NONE, ADIN1300_EXT_REG_PTR, ADIN1300_GE_RGMII_CFG);
-		phy_write(phydev, MDIO_DEVAD_NONE, ADIN1300_EXT_REG_DATA, 0xe01);
+		adin_config_rgmii_mode(phydev);
 	break;
 	default:
 		printf("%s: unknown phy_id 0x%x at addr %d\n", __func__, phy_id_1, phydev->addr);
