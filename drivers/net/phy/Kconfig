@@ -94,6 +94,11 @@ config PHY_AQUANTIA_FW_NAME
 config PHY_ATHEROS
 	bool "Atheros Ethernet PHYs support"
 
+config PHY_ADIN
+	bool "Analog Devices Industrial Ethernet PHYs"
+	help
+		Add support for configuring RGMII on Analog Devices ADIN PHYs.
+
 config PHY_BROADCOM
 	bool "Broadcom Ethernet PHYs support"
 

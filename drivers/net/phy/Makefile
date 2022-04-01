@@ -13,6 +13,7 @@ obj-$(CONFIG_PHYLIB_10G) += generic_10g.o
 obj-$(CONFIG_PHY_AQUANTIA) += aquantia.o
 obj-$(CONFIG_PHY_INPHI) += in112525.o
 obj-$(CONFIG_PHY_ATHEROS) += atheros.o
+obj-$(CONFIG_PHY_ADIN) += adin.o
 obj-$(CONFIG_PHY_BROADCOM) += broadcom.o
 obj-$(CONFIG_PHY_CORTINA) += cortina.o cortina_api.o
 obj-$(CONFIG_PHY_CORTINA_ACCESS) += ca_phy.o
