@@ -35,6 +35,7 @@
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/video.h>
 #include <asm/io.h>
+#include "adin.h"
 
 #ifdef CONFIG_FSL_FASTBOOT
 #include <fsl_fastboot.h>
@@ -391,6 +392,8 @@ static void setup_iomux_enet(void)
 	gpio_set_value(IMX_GPIO_NR(1, 25), 1);
 
 	SETUP_IOMUX_PADS(enet_pads2);
+
+	mdelay(20);
 }
 
 static iomux_v3_cfg_t const usdhc1_pads[] = {
@@ -697,30 +700,49 @@ static void setup_gpmi_nand(void)
 }
 #endif
 
+#define KSZ9031_PHY_ID 		0x221620
+#define KSZ9031_PHY_ID_MASK 	0xfffff0
+
 int board_phy_config(struct phy_device *phydev)
 {
 	if (phydev->drv->config)
 		phydev->drv->config(phydev);
 
-	/* manually configure PHY as master during master-slave negotiation */
-	phy_write(phydev, MDIO_DEVAD_NONE, 0x9, 0x1c00);
+	if (KSZ9031_PHY_ID == (phydev->phy_id & KSZ9031_PHY_ID_MASK)) {
+		printf("KSZ9021 PHY detected at addr %d\n", phydev->addr);
 
-	/* control data pad skew */
-	ksz9031_phy_extended_write(phydev, 0x02,
-			MII_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW,
-			MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x0000);
-	/* rx data pad skew */
-	ksz9031_phy_extended_write(phydev, 0x02,
-			MII_KSZ9031_EXT_RGMII_RX_DATA_SKEW,
-			MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x0000);
-	/* tx data pad skew */
-	ksz9031_phy_extended_write(phydev, 0x02,
-			MII_KSZ9031_EXT_RGMII_TX_DATA_SKEW,
-			MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x0000);
-	/* gtx and rx clock pad skew */
-	ksz9031_phy_extended_write(phydev, 0x02,
-			MII_KSZ9031_EXT_RGMII_CLOCK_SKEW,
-			MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x03FF);
+		/* manually configure PHY as master during master-slave negotiation */
+		phy_write(phydev, MDIO_DEVAD_NONE, 0x9, 0x1c00);
+
+		/* control data pad skew */
+		ksz9031_phy_extended_write(phydev, 0x02,
+				MII_KSZ9031_EXT_RGMII_CTRL_SIG_SKEW,
+				MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x0000);
+		/* rx data pad skew */
+		ksz9031_phy_extended_write(phydev, 0x02,
+				MII_KSZ9031_EXT_RGMII_RX_DATA_SKEW,
+				MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x0000);
+		/* tx data pad skew */
+		ksz9031_phy_extended_write(phydev, 0x02,
+				MII_KSZ9031_EXT_RGMII_TX_DATA_SKEW,
+				MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x0000);
+		/* gtx and rx clock pad skew */
+		ksz9031_phy_extended_write(phydev, 0x02,
+				MII_KSZ9031_EXT_RGMII_CLOCK_SKEW,
+				MII_KSZ9031_MOD_DATA_NO_POST_INC, 0x03FF);
+	} else if (ADIN1300_PHY_ID == phydev->phy_id) {
+		printf("ADIN1300 PHY detected at addr %d\n", phydev->addr);
+
+		/* Override phy-mode for ADIN1300 */
+		phydev->interface = PHY_INTERFACE_MODE_RGMII_ID;
+		adin_config_rgmii_mode(phydev);
+
+		/* Enable 125MHz clock out on GP_CLK pin */
+		adin_set_clk_rcvr_125_en(phydev, 1);
+	} else {
+		printf("%s: unknown phy_id 0x%x at addr %d\n",
+		       __func__, phydev->phy_id, phydev->addr);
+	}
 
 	return 0;
 }
