@@ -18,6 +18,9 @@ config MV88E61XX_SWITCH
 config PHYLIB_10G
 	bool "Generic 10G PHY support"
 
+config PHY_ADIN
+	bool "Analog Devices Ethernet PHYs support"
+
 config PHY_AQUANTIA
 	bool "Aquantia Ethernet PHYs support"
 
