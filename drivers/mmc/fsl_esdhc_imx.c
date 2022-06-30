@@ -1014,6 +1014,8 @@ static int esdhc_set_ios_common(struct fsl_esdhc_priv *priv, struct mmc *mmc)
 	if (mmc->selected_mode == MMC_HS_400 || mmc->selected_mode == MMC_HS_400_ES)
 		esdhc_set_strobe_dll(mmc);
 
+	mdelay(5);
+
 	if (priv->signal_voltage != mmc->signal_voltage) {
 		ret = esdhc_set_voltage(mmc);
 		if (ret) {
