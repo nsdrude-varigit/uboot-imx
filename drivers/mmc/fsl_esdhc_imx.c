@@ -284,7 +284,7 @@ static void esdhc_pio_read_write(struct fsl_esdhc_priv *priv,
 }
 #endif
 
-#ifdef CONFIG_SYS_FSL_ESDHC_USE_PIO
+// #ifdef CONFIG_SYS_FSL_ESDHC_USE_PIO
 static void esdhc_setup_watermark_level(struct fsl_esdhc_priv *priv,
 					struct mmc_data *data)
 {
@@ -304,7 +304,7 @@ static void esdhc_setup_watermark_level(struct fsl_esdhc_priv *priv,
 				   wml_value << 16);
 	}
 }
-#endif
+// #endif
 
 static void esdhc_setup_dma(struct fsl_esdhc_priv *priv, struct mmc_data *data)
 {
