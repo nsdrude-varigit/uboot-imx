@@ -147,6 +147,10 @@ int board_late_init(void)
 	extcon_ptn5150_setup(&usb_ptn5150);
 #endif
 
+#ifdef CONFIG_USB_ETHER
+	usb_ether_init();
+#endif
+
 #ifdef CONFIG_FEC_MXC
 	var_setup_mac(ep);
 #endif
