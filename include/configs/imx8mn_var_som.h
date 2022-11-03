@@ -144,8 +144,8 @@
 		"unzip ${img_addr} ${loadaddr}\0" \
 	"findfdt=" \
 		"if test $fdt_file = undefined; then " \
-			"if test $carrier_rev = legacy; then " \
-				"setenv fdt_file imx8mn-var-som-symphony-legacy.dtb; " \
+			"if test $carrier_rev = versaware; then " \
+				"setenv fdt_file imx8mn-var-som-versaware.dtb; " \
 			"else " \
 				"setenv fdt_file imx8mn-var-som-symphony.dtb; " \
 			"fi; " \
