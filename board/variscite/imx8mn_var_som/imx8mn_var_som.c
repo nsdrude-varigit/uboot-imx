@@ -175,9 +175,8 @@ int board_late_init(void)
 		env_set("som_rev", "som_rev13");
 		break;
 	}
-	var_carrier_eeprom_read(CARRIER_EEPROM_BUS, CARRIER_EEPROM_ADDR, &carrier_eeprom);
-	var_carrier_eeprom_get_revision(&carrier_eeprom, carrier_rev, sizeof(carrier_rev));
-	env_set("carrier_rev", carrier_rev);
+
+	env_set("carrier_rev", "versaware");
 
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
