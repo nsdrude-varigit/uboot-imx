@@ -13,7 +13,24 @@
 #include "imx_env.h"
 
 #define CONFIG_SYS_BOOTM_LEN		(64 * SZ_1M)
-#define CONFIG_SPL_MAX_SIZE		(148 * 1024)
+/*
+CONFIG_SPL_MAX_SIZE = SRAM - CSF_SIZE - DDR_FW_SIZE - LPDDR_FW_SIZE:
+
+DDR/LPDDR FW Size is ~144k, round up to 0x25000:
+36864	ddr4_1d_fw.bin
+34204	ddr4_2d_fw.bin
+36864	lpddr4_pmu_train_1d_fw.bin
+36864	lpddr4_pmu_train_2d_fw.bin
+
+CSF_SIZE default is 0x2000
+
+This leaves ~105k for SPL
+*/
+#ifdef CONFIG_CSF_SIZE
+#define CONFIG_SPL_MAX_SIZE		(SZ_256K - 0x25000 - CONFIG_CSF_SIZE)
+#else
+#define CONFIG_SPL_MAX_SIZE		(SZ_256K - 0x25000)
+#endif
 #define CONFIG_SYS_MONITOR_LEN		SZ_512K
 #define CONFIG_SYS_UBOOT_BASE	\
 	(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
