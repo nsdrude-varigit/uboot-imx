@@ -16,6 +16,8 @@
 #include <asm/arch/sys_proto.h>
 #include <linux/err.h>
 #include <asm/io.h>
+#include <display.h>
+
 
 #include "../../videomodes.h"
 #include <linux/string.h>
@@ -103,8 +105,8 @@ static void lcdifv3_set_mode(struct lcdifv3_priv *priv,
 	writel(CTRL_INV_VS, (ulong)(priv->reg_base + LCDIFV3_CTRL_CLR));
 
 	/* SEC MIPI DSI specific */
-	writel(CTRL_INV_PXCK, (ulong)(priv->reg_base + LCDIFV3_CTRL_CLR));
-	writel(CTRL_INV_DE, (ulong)(priv->reg_base + LCDIFV3_CTRL_CLR));
+	//writel(CTRL_INV_PXCK, (ulong)(priv->reg_base + LCDIFV3_CTRL_CLR));
+	//writel(CTRL_INV_DE, (ulong)(priv->reg_base + LCDIFV3_CTRL_CLR));
 
 }
 
@@ -344,22 +346,12 @@ static int lcdifv3_video_probe(struct udevice *dev)
 
 	lcdifv3_of_parse_thres(dev);
 
-	if (priv->disp_dev) {
-#if IS_ENABLED(CONFIG_VIDEO_BRIDGE)
-		if (device_get_uclass_id(priv->disp_dev) == UCLASS_VIDEO_BRIDGE) {
-			ret = video_bridge_attach(priv->disp_dev);
-			if (ret) {
-				dev_err(dev, "fail to attach bridge\n");
-				return ret;
-			}
+	printf("lcdifv3_video_probe000\n");
 
-			ret = video_bridge_set_backlight(priv->disp_dev, 80);
-			if (ret) {
-				dev_err(dev, "fail to set backlight\n");
-				return ret;
-			}
-		}
-#endif
+	ret = display_enable(priv->disp_dev, NULL, NULL);
+	if (ret) {
+		debug("%s: Display enable error %d\n", __func__, ret);
+		return ret;
 	}
 
 	mode.xres = timings.hactive.typ;
@@ -386,7 +378,7 @@ static int lcdifv3_video_probe(struct udevice *dev)
 					DCACHE_WRITEBACK);
 	video_set_flush_dcache(dev, true);
 	gd->fb_base = plat->base;
-
+	
 	return ret;
 }
 
@@ -416,6 +408,7 @@ static int lcdifv3_video_remove(struct udevice *dev)
 
 static const struct udevice_id lcdifv3_video_ids[] = {
 	{ .compatible = "fsl,imx8mp-lcdif1" },
+	{ .compatible = "fsl,imx8mp-lcdif2" },
 	{ /* sentinel */ }
 };
 
