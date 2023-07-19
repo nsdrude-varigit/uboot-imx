@@ -19,6 +19,8 @@
 #include <dm/uclass.h>
 #include <usb.h>
 #include <dwc3-uboot.h>
+#include <linux/libfdt.h>
+#include <fdt_support.h>
 
 #include "../common/imx9_eeprom.h"
 #include "../common/extcon-ptn5150.h"
@@ -97,6 +99,47 @@ int board_init(void)
 
 	return 0;
 }
+
+#ifdef CONFIG_OF_BOARD_SETUP
+int ft_board_setup(void *blob, struct bd_info *bd)
+{
+	struct var_eeprom *ep = VAR_EEPROM_DATA;
+
+	/*
+		somrev < 2:  wifi is sterling lwb/lwb5
+		somrev >= 2: wifi is iw612
+
+		brcm power sequencing is managed by userspace.
+		Free the power gpios for somrev < 2 by:
+			- Disabling the iw612_pwrseq
+			- Deleting the mmc-pwrseq property
+	*/
+	if (SOMREV_MAJOR(ep->somrev) < 2) {
+		int ret;
+
+		ret = fdt_find_and_setprop(blob, "/iw612_pwrseq", "status", "disabled", sizeof("disabled"), 1);
+		if (ret < 0) {
+			printf("Error setting status of /iw612_pwrseq in the DTB: %s\n", fdt_strerror(ret));
+			return 0;
+		}
+
+		int nodeoffset = fdt_path_offset(blob, "/soc@0/bus@42800000/mmc@428b0000");
+		if (nodeoffset < 0) {
+			printf("Error finding /soc@0/bus@42800000/mmc@428b0000 in the DTB: %s\n", fdt_strerror(nodeoffset));
+			return 0;
+		}
+
+		ret = fdt_delprop(blob, nodeoffset, "mmc-pwrseq");
+		if (ret < 0) {
+			printf("Error deleting mmc-pwrseq property from /soc@0/bus@42800000/mmc@428b0000 in the DTB: %s\n", fdt_strerror(ret));
+			return 0;
+		}
+	}
+
+	return 0;
+}
+#endif
+
 
 #define SDRAM_SIZE_STR_LEN 5
 
