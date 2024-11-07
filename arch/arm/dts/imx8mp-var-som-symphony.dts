@@ -9,6 +9,13 @@
 / {
 	model = "Variscite VAR-SOM-MX8M-PLUS on Symphony-Board";
 
+	backlight: backlight {
+		compatible = "gpio-backlight";
+		gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+		default-on;
+	};
+
 	chosen {
 		stdout-path = &uart2;
 	};
@@ -46,6 +53,37 @@
 		gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
 		states = <3300000 0
 			  1800000 1>;
+	};
+
+	panel_lvds: panel-lvds {
+		bootph-pre-ram;
+		compatible = "simple-panel";
+		status= "okay";
+		backlight = <&backlight>;
+		width-mm = <153>;
+		height-mm = <86>;
+		data-mapping = "jeida-24";
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: timing0 {
+				bootph-pre-ram;
+				clock-frequency = <30000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <40>;
+				hfront-porch = <40>;
+				vback-porch = <29>;
+				vfront-porch = <13>;
+				hsync-len = <48>;
+				vsync-len = <3>;
+				de-active = <1>;
+			};
+		};
+		port@0 {
+			lvds_in: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
 	};
 };
 
@@ -199,6 +237,12 @@
 
 &iomuxc {
 
+	pinctrl_pwm1: pwm1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05				0x116
+		>;
+	};
+
 	pinctrl_uart2: uart2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_UART2_RXD__UART2_DCE_RX				0x40
@@ -301,4 +345,32 @@
 			MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC				0x16
 		>;
 	};
+};
+
+/* LVDS */
+&lcdif2 {
+	status = "okay";
+};
+
+&ldb {
+	/delete-property/ power-domains;
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "jeida";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds_out: endpoint {
+				remote-endpoint = <&lvds_in>;
+			};
+		};
+	};
+};
+
+&ldb_phy {
+	status = "okay";
 };
