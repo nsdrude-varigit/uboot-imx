@@ -419,6 +419,6 @@ U_BOOT_DRIVER(lcdifv3_video) = {
 	.bind	= lcdifv3_video_bind,
 	.probe	= lcdifv3_video_probe,
 	.remove = lcdifv3_video_remove,
-	.flags	= DM_FLAG_PRE_RELOC | DM_FLAG_OS_PREPARE,
+	.flags	= DM_FLAG_PRE_RELOC | DM_FLAG_OS_PREPARE | DM_FLAG_IGNORE_DEFAULT_CLKS,
 	.priv_auto   = sizeof(struct lcdifv3_priv),
 };

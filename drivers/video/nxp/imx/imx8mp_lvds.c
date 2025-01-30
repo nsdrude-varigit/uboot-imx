@@ -271,6 +271,7 @@ U_BOOT_DRIVER(imx8mp_ldb) = {
 	.name				= "imx8mp_ldb",
 	.id				= UCLASS_DISPLAY,
 	.of_match			= imx8mp_ldb_ids,
+	.flags				= DM_FLAG_IGNORE_DEFAULT_CLKS,
 	.bind				= imx8mp_ldb_bind,
 	.probe				= imx8mp_ldb_probe,
 	.ops				= &imx8mp_ldb_ops,
