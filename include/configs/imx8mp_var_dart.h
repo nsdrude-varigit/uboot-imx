@@ -83,6 +83,10 @@
 	"image=Image.gz\0" \
 	"img_addr=0x42000000\0" \
 	"splashimage=0x4F600000\0" \
+	"splashfile=/boot/splash.bmp\0" \
+	"splashsourceauto=yes\0" \
+	"backlight_disable=gpio clear $backlight_gpio\0" \
+	"backlight_enable=gpio set $backlight_gpio\0" \
 	"console=ttymxc0,115200\0" \
 	"fdt_addr_r=0x43000000\0" \
 	"fdt_addr=0x43000000\0"			\
@@ -149,6 +153,7 @@
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
 		"run optargs; " \
+		"run backlight_disable; " \
 		"if test ${boot_fit} = yes || test ${boot_fit} = try; then " \
 			"bootm ${loadaddr}; " \
 		"else " \
@@ -233,6 +238,10 @@
 #define CONFIG_USB_MAX_CONTROLLER_COUNT		2
 #define CONFIG_USBD_HS
 #define CONFIG_USB_GADGET_VBUS_DRAW		2
+
+#ifdef CONFIG_DM_VIDEO
+#define CONFIG_HIDE_LOGO_VERSION
+#endif
 
 /* EEPROM configs */
 #define VAR_EEPROM_DRAM_START	(PHYS_SDRAM + (DEFAULT_SDRAM_SIZE >> 1))

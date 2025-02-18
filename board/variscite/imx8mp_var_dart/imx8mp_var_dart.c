@@ -23,7 +23,10 @@
 #include <dwc3-uboot.h>
 #include <power/regulator.h>
 #include <linux/delay.h>
+#include <imx_sip.h>
+#include <linux/arm-smccc.h>
 #include <mmc.h>
+#include <splash.h>
 
 #include "../common/extcon-ptn5150.h"
 #include "../common/imx8_eeprom.h"
@@ -319,8 +322,13 @@ int board_ehci_usb_phy_mode(struct udevice *dev)
 #endif
 #endif
 
+#define DISPMIX				13
+#define MIPI				15
+
 int board_init(void)
 {
+	struct arm_smccc_res res;
+
 	if (CONFIG_IS_ENABLED(EXTCON_PTN5150)) {
 		extcon_ptn5150_setup(&usb_ptn5150);
 	}
@@ -336,6 +344,12 @@ int board_init(void)
 #if defined(CONFIG_USB_DWC3) || defined(CONFIG_USB_XHCI_IMX8M)
 	init_usb_clk();
 #endif
+
+	/* enable the dispmix & mipi phy power domain */
+	arm_smccc_smc(IMX_SIP_GPC, IMX_SIP_GPC_PM_DOMAIN,
+		      DISPMIX, true, 0, 0, 0, 0, &res);
+	arm_smccc_smc(IMX_SIP_GPC, IMX_SIP_GPC_PM_DOMAIN,
+		      MIPI, true, 0, 0, 0, 0, &res);
 
 	return 0;
 }
@@ -370,6 +384,7 @@ int board_late_init(void)
 		var_carrier_eeprom_read(CARRIER_EEPROM_BUS_SOM, CARRIER_EEPROM_ADDR, &carrier_eeprom);
 		var_carrier_eeprom_get_revision(&carrier_eeprom, carrier_rev, sizeof(carrier_rev));
 		env_set("carrier_rev", carrier_rev);
+		env_set("backlight_gpio", "GPIO5_5");
 	}
 	else if (board_id == BOARD_ID_DART) {
 		env_set("board_name", "DART-MX8M-PLUS");
@@ -377,8 +392,10 @@ int board_late_init(void)
 		var_carrier_eeprom_read(CARRIER_EEPROM_BUS_DART, CARRIER_EEPROM_ADDR, &carrier_eeprom);
 		var_carrier_eeprom_get_revision(&carrier_eeprom, carrier_rev, sizeof(carrier_rev));
 		env_set("carrier_rev", carrier_rev);
+		env_set("backlight_gpio", "GPIO1_1");
 	}
 
+	splash_display();
 	var_setup_mac(ep);
 	var_eeprom_print_prod_info(ep);
 

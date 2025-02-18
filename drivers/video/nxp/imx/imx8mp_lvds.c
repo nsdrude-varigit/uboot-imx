@@ -176,12 +176,12 @@ static int imx8mp_ldb_probe(struct udevice *dev)
 			ret = panel_enable_backlight(priv->conn_dev);
 			if (ret) {
 					dev_err(dev, "fail to enable panel backlight\n");
-					return ret;
+					// return ret;
 			}
 			ret = panel_set_backlight(priv->conn_dev, 80);
 				if (ret) {
 					dev_err(dev, "fail to set panel backlight\n");
-					return ret;
+					// return ret;
 			}
 		}
 

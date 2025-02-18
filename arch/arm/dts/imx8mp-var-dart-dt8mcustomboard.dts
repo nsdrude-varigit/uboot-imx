@@ -14,6 +14,13 @@
 		gpio6 = &pca6408_2;
 	};
 
+	backlight: backlight {
+		compatible = "gpio-backlight";
+		gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+		default-on;
+	};
+
 	chosen {
 		stdout-path = &uart1;
 	};
@@ -35,6 +42,37 @@
 		enable-active-high;
 		startup-delay-us = <100>;
 		off-on-delay-us = <12000>;
+	};
+
+	panel_lvds: panel-lvds {
+		bootph-pre-ram;
+		compatible = "simple-panel";
+		status= "okay";
+		backlight = <&backlight>;
+		width-mm = <153>;
+		height-mm = <86>;
+		data-mapping = "jeida-24";
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: timing0 {
+				bootph-pre-ram;
+				clock-frequency = <74250000>;
+				hactive = <800>;
+				vactive = <480>;
+				hback-porch = <40>;
+				hfront-porch = <40>;
+				vback-porch = <29>;
+				vfront-porch = <13>;
+				hsync-len = <48>;
+				vsync-len = <3>;
+				de-active = <1>;
+			};
+		};
+		port@0 {
+			lvds_in: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
 	};
 };
 
@@ -177,7 +215,41 @@
 	status = "okay";
 };
 
+/* LVDS */
+&lcdif2 {
+	status = "okay";
+};
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "jeida";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds_out: endpoint {
+				remote-endpoint = <&lvds_in>;
+			};
+		};
+	};
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
 &iomuxc {
+
+	pinctrl_pwm1: pwm1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01				0x116
+		>;
+	};
+
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_UART1_RXD__UART1_DCE_RX				0x40
